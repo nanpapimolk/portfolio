@@ -1,3 +1,10 @@
+This query aims to calculate two key metrics for each region: the average height of the tallest athletes and the percentage of the world's GDP contributed by each region. It achieves this by:
+
+Aggregating Data Using Window Functions: The query employs the ROW_NUMBER() window function to rank athletes by height within each country and select only the tallest athlete for further analysis.
+Utilizing Subqueries: A subquery extracts the height of the tallest athlete from each country, which is then used to compute the average height of the tallest athletes by region.
+Computing GDP Percentages: The query calculates the percentage of world GDP represented by each region by summing the GDP for each region and dividing it by the total global GDP.
+The following code demonstrates this approach:
+
 SELECT
 	-- Pull in region and calculate avg tallest height
     region,
