@@ -1,10 +1,18 @@
-This query seeks to identify the top athletes from countries that have won Nobel Prizes. The process includes:
-- Transforming data with CASE WHEN
-- Aggregating data using functions like COUNT and SUM
-- Combining data through UNION and JOIN operations
-- Conditional data with WHERE clause
-- Sorting data using ORDER BY
 
+Here with analyzing olympics dataset, which there are summer and winter games which includes five tables: Summer games table ()
+
+
+The process includes:
+
+- Transforming data with CASE WHEN statements
+- Aggregating data using functions like COUNT, SUM, and window functions
+- Combining data through UNION and JOIN operations
+- Filtering data with WHERE clauses
+- Sorting data using ORDER BY clauses
+
+
+
+First query, identify the top athletes from countries that have won Nobel Prizes.
 
 -- Pull event and unique athletes from summer_games 
 SELECT 
@@ -41,31 +49,8 @@ LIMIT 10;
 
 
 
-SELECT 
-	-- Clean the country field to only show country_code
-    LEFT(REPLACE(UPPER(TRIM(c.country)),'.',''),3) AS country_code,
-    -- Pull in pop_in_millions and medals_per_million 
-	pop_in_millions,
-    -- Add the three medal fields using one sum function
-	SUM(COALESCE(bronze,0) + COALESCE(silver,0) + COALESCE(gold,0)) AS medals,
-	SUM(COALESCE(bronze,0) + COALESCE(silver,0) + COALESCE(gold,0)) / CAST(cs.pop_in_millions AS float) AS medals_per_million
-FROM summer_games AS s
-JOIN countries AS c 
-ON s.country_id = c.id
--- Update the newest join statement to remove duplication
-JOIN country_stats AS cs 
-ON s.country_id = cs.country_id AND s.year = CAST(cs.year AS date)
--- Filter out null populations
-WHERE pop_in_millions IS NOT NULL
-GROUP BY c.country, pop_in_millions
--- Keep only the top 25 medals_per_million rows
-ORDER BY medals_per_million DESC
-LIMIT 25;
 
-
-
-
-This query aims to calculate two key metrics for each region: the average height of the tallest athletes and the percentage of the world's GDP contributed by each region. It achieves this by:
+Second query aims to calculate two key metrics for each region: the average height of the tallest athletes and the percentage of the world's GDP contributed by each region. It achieves this by:
 
 Aggregating Data Using Window Functions: The query employs the ROW_NUMBER() window function to rank athletes by height within each country and select only the tallest athlete for further analysis.
 Utilizing Subqueries: A subquery extracts the height of the tallest athlete from each country, which is then used to compute the average height of the tallest athletes by region.
@@ -100,4 +85,4 @@ WHERE row_num = 1
 GROUP BY region;
 
 
-
+Reference: DataCamp
