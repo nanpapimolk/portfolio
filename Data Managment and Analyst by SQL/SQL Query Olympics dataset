@@ -1,88 +1,80 @@
+### Analysis of Olympics Dataset
 
-Here with analyzing olympics dataset, which there are summer and winter games which includes five tables: Summer games table (sport, event, year, athlete_id, country_id, bronze, silver, gold)
-Winter games table (sport, event, year, athlete_id, country_id, bronze, silver, gold), countries (id, country, region), 
-country_stats (year, country_id, gdp, pop_in_billions, nobel_prize_winners), athletes(id, name, gender, weight, height)
+The Olympics dataset comprises two main tables, Summer Games and Winter Games, each containing details about sports events, athletes, and medal counts. Supporting these are additional tables: Countries (id, country, region), Country Stats (year, country_id, gdp, pop_in_billions, nobel_prize_winners), and Athletes (id, name, gender, weight, height).
 
-The process includes:
+### Process Overview
 
-- Transforming data with CASE WHEN statements
-- Aggregating data using functions like COUNT, SUM, and window functions
-- Combining data through UNION and JOIN operations
-- Filtering data with WHERE clauses
-- Sorting data using ORDER BY clauses
+The analysis involves:
 
+- **Transforming data with CASE WHEN statements**
+- **Aggregating data using functions like COUNT, SUM, and window functions**
+- **Combining data through UNION and JOIN operations**
+- **Filtering data with WHERE clauses**
+- **Sorting data using ORDER BY clauses**
 
-
-First query, identify the top athletes from countries that have won Nobel Prizes.
-
--- Pull event and unique athletes from summer_games 
+### First Query: Identifying Top Athletes from Nobel Prize-Winning Countries
 
 ```sql
+-- Pull event and unique athletes from summer_games 
 SELECT 
     event,
-    -- Add the gender field below
-    CASE WHEN event LIKE '%Women%' THEN 'female' 
-    ELSE 'male' END AS gender,
+    CASE WHEN event LIKE '%Women%' THEN 'female' ELSE 'male' END AS gender,
     COUNT(DISTINCT athlete_id) AS athletes
 FROM summer_games
--- Only include countries that won a nobel prize
+-- Only include countries that won a Nobel Prize
 WHERE country_id IN 
-	(SELECT country_id 
-    FROM country_stats 
-    WHERE nobel_prize_winners > 0)
+    (SELECT country_id 
+     FROM country_stats 
+     WHERE nobel_prize_winners > 0)
 GROUP BY event
--- Add the second query below and combine with a UNION
+
 UNION
+
 SELECT 
-	event,
-    -- Add the gender field below
-    CASE WHEN event LIKE '%Women%' THEN 'female' 
-    ELSE 'male' END AS gender,
+    event,
+    CASE WHEN event LIKE '%Women%' THEN 'female' ELSE 'male' END AS gender,
     COUNT(DISTINCT athlete_id) AS athletes
 FROM winter_games
+-- Only include countries that won a Nobel Prize
 WHERE country_id IN 
-	(SELECT country_id 
-    FROM country_stats 
-    WHERE nobel_prize_winners > 0)
+    (SELECT country_id 
+     FROM country_stats 
+     WHERE nobel_prize_winners > 0)
 GROUP BY event
+
 -- Order and limit the final output
 ORDER BY athletes DESC
 LIMIT 10;
+```
 
+### Second Query: Regional Analysis of Athlete Heights and GDP Contribution
 
-Second query aims to calculate two key metrics for each region: the average height of the tallest athletes and the percentage of the world's GDP contributed by each region. It achieves this by:
+This query calculates two metrics for each region: the average height of the tallest athletes and the percentage of the world's GDP contributed by each region.
 
-Aggregating Data Using Window Functions: The query employs the ROW_NUMBER() window function to rank athletes by height within each country and select only the tallest athlete for further analysis.
-Utilizing Subqueries: A subquery extracts the height of the tallest athlete from each country, which is then used to compute the average height of the tallest athletes by region.
-Computing GDP Percentages: The query calculates the percentage of world GDP represented by each region by summing the GDP for each region and dividing it by the total global GDP.
-The following code demonstrates this approach:
-
+```sql
 SELECT
-	-- Pull in region and calculate avg tallest height
+    -- Pull in region and calculate average tallest height
     region,
     AVG(height) AS avg_tallest,
-    -- Calculate region's percent of world gdp
-    SUM(SUM(gdp)) OVER(PARTITION BY region)/SUM(SUM(gdp)) OVER() AS perc_world_gdp    
+    -- Calculate region's percent of world GDP
+    SUM(SUM(gdp)) OVER(PARTITION BY region) / SUM(SUM(gdp)) OVER() AS perc_world_gdp
 FROM countries AS c
 JOIN
     (SELECT 
-     	-- Pull in country_id and height
         country_id, 
         height, 
-        -- Number the height of each country's athletes
         ROW_NUMBER() OVER (PARTITION BY country_id ORDER BY height DESC) AS row_num
-    FROM winter_games AS w 
-    JOIN athletes AS a ON w.athlete_id = a.id
-    GROUP BY country_id, height
-    -- Alias as subquery
-    ORDER BY country_id, height DESC) AS subquery
+     FROM winter_games AS w 
+     JOIN athletes AS a ON w.athlete_id = a.id
+     GROUP BY country_id, height
+     ORDER BY country_id, height DESC) AS subquery
 ON c.id = subquery.country_id
--- Join to country_stats
 JOIN country_stats AS cs
 ON c.id = cs.country_id
--- Only include the tallest height for each country
 WHERE row_num = 1
 GROUP BY region;
+```
 
+### Reference
 
-Reference: DataCamp 
+DATACAMP
