@@ -1,7 +1,7 @@
 ```markdown
 # Description
 
-This chapter discusses SVM with synthetic data from the paper by Tang M. et al., 2021.
+This chapter delves into SVM (Support Vector Machine) analysis using synthetic data from the study by Tang M. et al., 2021. The synthetic data used in this analysis contains three labels that are ordered, allowing for ordinal classification tasks. This Python code utilizes SVM to predict outcomes for synthetic data with three ordered labels. It includes data generation, model training with hyperparameter tuning using GridSearchCV, and evaluation on a test set.
 
 ## 1. Import Necessary Libraries
 
