@@ -1,6 +1,7 @@
 
-Here with analyzing olympics dataset, which there are summer and winter games which includes five tables: Summer games table ()
-
+Here with analyzing olympics dataset, which there are summer and winter games which includes five tables: Summer games table (sport, event, year, athlete_id, country_id, bronze, silver, gold)
+Winter games table (sport, event, year, athlete_id, country_id, bronze, silver, gold), countries (id, country, region), 
+country_stats (year, country_id, gdp, pop_in_billions, nobel_prize_winners), athletes(id, name, gender, weight, height)
 
 The process includes:
 
@@ -15,6 +16,8 @@ The process includes:
 First query, identify the top athletes from countries that have won Nobel Prizes.
 
 -- Pull event and unique athletes from summer_games 
+
+```sql
 SELECT 
     event,
     -- Add the gender field below
@@ -45,9 +48,6 @@ GROUP BY event
 -- Order and limit the final output
 ORDER BY athletes DESC
 LIMIT 10;
-
-
-
 
 
 Second query aims to calculate two key metrics for each region: the average height of the tallest athletes and the percentage of the world's GDP contributed by each region. It achieves this by:
