@@ -1,0 +1,16 @@
+
+This qurey demonstrate to summarize individaul baking information that includes
+
+
+
+
+SELECT c.person_id, 
+      SUM(CASE WHEN d.type = 'deposit' THEN d.amount ELSE 0 END), 
+      SUM(CASE WHEN d.type = 'withdraw' THEN d.amount ELSE 0 END), 
+      SUM(CASE WHEN d.type = 'deposit' THEN d.amount ELSE 0 END) + SUM(CASE WHEN d.type = 'withdraw' THEN d.amount ELSE 0 END) AS current_amount,
+      count(CASE WHEN d.type = 'deposit' THEN 1  END),
+      count(CASE WHEN d.type = 'withdraw' THEN 1  END)
+FROM Customer c
+ LEFT JOIN Account a ON c.person_id = a.person_id
+ LEFT JOIN Deposit d ON a.account_id = d.account_id
+Group BY c.person_id
